@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask Chart.js Example</title>
+    <!-- Include Chart.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div style="width: 600px; margin: auto;">
+    <canvas id="myChart"></canvas>
+</div>
+
+<script>
+    // Use Jinja2 to inject Flask data directly into JS variables
+    const labels = {{ labels | tojson }};
+    const dataValues = {{ values | tojson }};
+
+    const ctx = document.getElementById('myChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar', // Change to 'line', 'pie', etc. as needed
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Monthly Sales',
+                data: dataValues,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+</body>
+</html>
