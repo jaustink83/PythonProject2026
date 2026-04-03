@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Predict Your Grade{% endblock %}
+
+{% block extra_head %}
+
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Predict your grade</h1>
+  <p>
+    Fill in as many fields as you like — anything left blank will be estimated
+    from the dataset average. The more you fill in, the more personalised
+    your prediction.
+  </p>
+</div>
+
+<form method="POST" action="/predict" autocomplete="off">
+
+  <p class="section-label">Student information</p>
+  <div class="fields-grid">
+    {% for field, meta in fields.items() %}
+    <div class="field-card">
+      <label for="{{ field }}">{{ meta.label }}</label>
+
+      {% if meta.type == 'select' %}
+        <select name="{{ field }}" id="{{ field }}">
+          <option value="">— skip —</option>
+          {% if meta.get('option_labels') %}
+            {% for opt, lbl in zip(meta.options, meta.option_labels) %}
+              <option value="{{ opt }}">{{ lbl }}</option>
+            {% endfor %}
+          {% else %}
+            {% for opt in meta.options %}
+              <option value="{{ opt }}">{{ opt }}</option>
+            {% endfor %}
+          {% endif %}
+        </select>
+
+      {% else %}
+        <input
+          type="number"
+          name="{{ field }}"
+          id="{{ field }}"
+          min="{{ meta.min }}"
+          max="{{ meta.max }}"
+          step="1"
+          placeholder="skip  ({{ meta.min }}–{{ meta.max }})"
+        />
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="submit-row">
+    <button type="submit" class="btn btn-primary btn-lg">
+      Predict my grade
+    </button>
+    <span class="submit-note">
+      Result will be printed to the server console (Release 1).
+    </span>
+  </div>
+
+</form>
+{% endblock %}

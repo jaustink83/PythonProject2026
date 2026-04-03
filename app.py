@@ -1,64 +1,81 @@
-from sklearn.impute import SimpleImputer
-from ucimlrepo import fetch_ucirepo
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
+"""
+Routes:
+  GET  /          → render input form
+  POST /predict   → run model, print result to console, show confirmation page
+"""
 
-def interpret_grade(score):
-    percentage = score * 5
-    if score >= 16:
-        letter = 'A'
-    elif score >= 14:
-        letter = 'B'
-    elif score >= 12:
-        letter = 'C'
-    elif score >= 10:
-        letter = 'D'
-    else:
-        letter = 'F'
-    return f"{score}/20 ({percentage}%) - Grade: {letter}"
+from flask import Flask, render_template, request, redirect, url_for, flash
+from ml_model import get_model, ALL_ALLOWED_FIELDS
 
-imputer = SimpleImputer(strategy='mean')
-my_features = ['sex', 'studytime', 'age', 'absences', 'failures']
-# sex - M or F
-# age - 15 through 22
-# studytime - weekly study time in hours
-# absences - number of missed classes
-# failures - number
+app = Flask(__name__)
+app.jinja_env.globals.update(zip=zip)
+app.secret_key = 'release1-dev-secret'
 
-# Fetch dataset
-student_performance = fetch_ucirepo(id=320)
 
-# Extract features and targets
-X = student_performance.data.features #[my_features]
-y = student_performance.data.targets['G3'] # Using G3 (final grade) as target
+# Preload the model when the app starts so the first request is faster.
+with app.app_context():
+    get_model()
 
-# The dataset has many string/object types that sklearn cannot handle directly
-X = pd.get_dummies(X, drop_first=True)
 
-# Split the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+# ---------------------------------------------------------------------------
+# Routes
+# ---------------------------------------------------------------------------
 
-imputer.fit(X_train)
+@app.route('/', methods=['GET'])
+def index():
+    """Render the prediction form."""
+    return render_template('predict.html', fields=ALL_ALLOWED_FIELDS)
 
-# Initialize and train model
-model = RandomForestClassifier()
-model.fit(X_train, y_train)
 
-# Prints required fields
-print(model.feature_names_in_)
+@app.route('/predict', methods=['POST'])
+def predict():
+    """Collect form data, run model, print result to console."""
+    form_data = request.form.to_dict()
 
-new_student = pd.DataFrame([{
-    'studytime': 4,
-    'age': 17,
-    'absences': 0,
-    'failures': 0,
-    'sex_M': 1,
-}])
+    # Build user_inputs from only the fields that were actually filled in.
+    user_inputs = {}
+    for field, meta in ALL_ALLOWED_FIELDS.items():
+        val = form_data.get(field, '').strip()
+        if val == '':
+            continue  # Leave blank
+        try:
+            if meta['type'] == 'number':
+                user_inputs[field] = float(val)
+            else:
+                try:
+                    user_inputs[field] = float(val)
+                except ValueError:
+                    user_inputs[field] = val
+        except Exception as exc:
+            print(f"[predict] Skipping field {field!r}: {exc}")
 
-new_student = new_student.reindex(columns=X_train.columns)
-new_student_imputed = imputer.transform(new_student)
-new_student_final = pd.DataFrame(new_student_imputed, columns=X_train.columns)
+    if not user_inputs:
+        flash('Please fill in at least one field before predicting.', 'warning')
+        return redirect(url_for('index'))
 
-prediction = model.predict(new_student_final)
-print(f"Predicted Grade: {interpret_grade(prediction[0])}")
+    model  = get_model()
+    result = model.predict(user_inputs)
+
+    # ── Console output ──────────────────
+    print("\n" + "=" * 55)
+    print("  GRADE PREDICTION RESULT")
+    print("=" * 55)
+    print(f"  Predicted grade : {result['score']}/20")
+    print(f"  Percentage      : {result['percentage']}%")
+    print(f"  Letter grade    : {result['letter']}")
+    print("-" * 55)
+    print(f"  Fields provided : {', '.join(result['fields_used']) or 'none'}")
+    print("=" * 55 + "\n")
+    # ────────────────────────────────────────────────────────────────────
+
+    return render_template(
+        'result_console.html',
+        result=result,
+        inputs=user_inputs,
+        fields=ALL_ALLOWED_FIELDS,
+    )
+
+
+# ---------------------------------------------------------------------------
+
+app.run(debug=True, host='0.0.0.0', port=5000)
