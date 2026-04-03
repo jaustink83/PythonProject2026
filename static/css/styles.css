@@ -1,0 +1,259 @@
+/* ── Reset & base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080c14;
+      --surface:   #0e1420;
+      --surface2:  #141c2e;
+      --border:    #1e2d47;
+      --border2:   #263550;
+      --text:      #e8edf5;
+      --muted:     #6b7fa0;
+      --faint:     #3a4f72;
+      --accent:    #3b82f6;
+      --accent2:   #60a5fa;
+      --success:   #22c55e;
+      --warning:   #f59e0b;
+      --danger:    #ef4444;
+      --grade-a:   #22c55e;
+      --grade-b:   #84cc16;
+      --grade-c:   #eab308;
+      --grade-d:   #f97316;
+      --grade-f:   #ef4444;
+      --radius:    10px;
+      --radius-lg: 16px;
+      --font-body: 'DM Sans', sans-serif;
+      --font-head: 'Syne', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    html { font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    /* ── Navbar ───────────────────────────────────────────── */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 60px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .navbar .brand {
+      font-family: var(--font-head);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent2);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .navbar .brand span { color: var(--muted); font-weight: 400; }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links .nav-user { color: var(--faint); font-size: 0.85rem; }
+
+    /* ── Page container ───────────────────────────────────── */
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    /* ── Flash alerts ─────────────────────────────────────── */
+    .alerts { margin-bottom: 1.5rem; }
+    .alert {
+      padding: 0.75rem 1.1rem;
+      border-radius: var(--radius);
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      border-left: 3px solid;
+    }
+    .alert-warning  { background: #2d2000; border-color: var(--warning);  color: #fcd34d; }
+    .alert-danger   { background: #2d0000; border-color: var(--danger);   color: #fca5a5; }
+    .alert-success  { background: #002d10; border-color: var(--success);  color: #86efac; }
+    .alert-info     { background: #001a2d; border-color: var(--accent);   color: #93c5fd; }
+
+    /* ── Typography helpers ───────────────────────────────── */
+    h1, h2, h3 { font-family: var(--font-head); font-weight: 700; letter-spacing: -0.03em; }
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.6rem; }
+    h3 { font-size: 1.2rem; }
+    .text-muted  { color: var(--muted); }
+    .text-accent { color: var(--accent2); }
+    code, .mono  { font-family: var(--font-mono); font-size: 0.9em; }
+
+    /* ── Buttons ──────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: var(--radius);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:hover   { opacity: 0.88; transform: translateY(-1px); }
+    .btn:active  { transform: translateY(0); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-ghost   { background: transparent; border: 1px solid var(--border2); color: var(--muted); }
+    .btn-ghost:hover { color: var(--text); border-color: var(--faint); }
+    .btn-lg      { padding: 0.85rem 2rem; font-size: 1.05rem; }
+
+    /* ── Page header ──────────────────────────────────────────── */
+      .page-header {
+        margin-bottom: 2.5rem;
+      }
+      .page-header h1 {
+        font-size: 2rem;
+        margin-bottom: 0.4rem;
+      }
+      .page-header p {
+        color: var(--muted);
+        max-width: 560px;
+        font-size: 0.95rem;
+      }
+
+      /* ── Section label ────────────────────────────────────────── */
+      .section-label {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: 0.8rem;
+      }
+
+      /* ── Field grid ───────────────────────────────────────────── */
+      .fields-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 0.85rem;
+        margin-bottom: 2rem;
+      }
+
+      .field-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0.9rem 1rem;
+        transition: border-color 0.2s;
+      }
+      .field-card:focus-within {
+        border-color: var(--accent);
+      }
+
+      .field-card label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--muted);
+        margin-bottom: 0.4rem;
+        letter-spacing: 0.01em;
+      }
+
+      .field-card input,
+      .field-card select {
+        width: 100%;
+        padding: 0.5rem 0.65rem;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.15s;
+        appearance: none;
+        -webkit-appearance: none;
+      }
+      .field-card input:focus,
+      .field-card select:focus {
+        border-color: var(--accent);
+      }
+      .field-card select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7fa0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.7rem center;
+        padding-right: 2rem;
+      }
+      .field-card input::placeholder { color: var(--faint); }
+      /* dim when value is the skip option */
+      .field-card select option[value=""] { color: var(--faint); }
+
+      /* ── Submit row ───────────────────────────────────────────── */
+      .submit-row {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        flex-wrap: wrap;
+      }
+      .submit-note {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      .console-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          padding: 2rem 2.5rem;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+        .console-card h2 {
+          font-size: 1.5rem;
+          margin-bottom: 0.4rem;
+          color: var(--accent2);
+        }
+        .console-card .subtitle {
+          color: var(--muted);
+          margin-bottom: 1.8rem;
+          font-size: 0.92rem;
+        }
+
+        /* Fake terminal block */
+        .terminal {
+          background: #020408;
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          padding: 1.2rem 1.4rem;
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          color: #a8d4a8;
+          margin-bottom: 1.8rem;
+          white-space: pre;
+          overflow-x: auto;
+        }
+        .terminal .t-dim   { color: #4a6040; }
+        .terminal .t-key   { color: #7ec8e3; }
+        .terminal .t-val   { color: #e8e8a8; }
+        .terminal .t-grade-a { color: #22c55e; font-weight: 600; }
+        .terminal .t-grade-b { color: #84cc16; font-weight: 600; }
+        .terminal .t-grade-c { color: #eab308; font-weight: 600; }
+        .terminal .t-grade-d { color: #f97316; font-weight: 600; }
+        .terminal .t-grade-f { color: #ef4444; font-weight: 600; }
+
+        .actions { display: flex; gap: 1rem; flex-wrap: wrap; }
