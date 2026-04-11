@@ -94,7 +94,26 @@ class GradeModel:
 
     # ------------------------------------------------------------------
     def _load_and_train(self, user_inputs: dict):
-        dataset = fetch_ucirepo(id=320)
+        #Get Data from UCI ML Repo
+        #dataset = fetch_ucirepo(id=320)
+
+        #Get data loacally
+        student_mat = pd.read_csv("student-mat.csv", sep=";")
+        student_por = pd.read_csv("student-por.csv", sep=";")
+        target_col = "G3"
+
+        class SimpleDataset:
+            class data:
+                pass
+
+        dataset = SimpleDataset()
+        dataset.data = SimpleDataset.data()
+
+        # Use Math dataset as primary (common choice); swap for student_por if needed
+        df = pd.concat([student_mat, student_por], ignore_index=True)
+        dataset.data.features = df.drop(columns=[target_col])
+        dataset.data.targets  = df[[target_col]]
+
         X = dataset.data.features
         y = dataset.data.targets['G3']
 
