@@ -257,3 +257,122 @@
         .terminal .t-grade-f { color: #ef4444; font-weight: 600; }
 
         .actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+       .result {
+         display: flex;
+         align-items: flex-start;
+         gap: 2rem;
+         margin-bottom: 3rem;
+         flex-wrap: wrap;
+       }
+
+       .grade-badge {
+         flex-shrink: 0;
+         width: 130px;
+         height: 130px;
+         border-radius: var(--radius-lg);
+         background: var(--surface);
+         border: 2px solid var(--border);
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         justify-content: center;
+         gap: 0.2rem;
+       }
+       .grade-badge .letter {
+         font-family: var(--font-head);
+         font-size: 3.8rem;
+         font-weight: 800;
+         line-height: 1;
+       }
+       .grade-badge .score {
+         font-family: var(--font-mono);
+         font-size: 0.78rem;
+         color: var(--muted);
+       }
+       .grade-badge.grade-a { border-color: var(--grade-a); }
+       .grade-badge.grade-a .letter { color: var(--grade-a); }
+       .grade-badge.grade-b { border-color: var(--grade-b); }
+       .grade-badge.grade-b .letter { color: var(--grade-b); }
+       .grade-badge.grade-c { border-color: var(--grade-c); }
+       .grade-badge.grade-c .letter { color: var(--grade-c); }
+       .grade-badge.grade-d { border-color: var(--grade-d); }
+       .grade-badge.grade-d .letter { color: var(--grade-d); }
+       .grade-badge.grade-f { border-color: var(--grade-f); }
+       .grade-badge.grade-f .letter { color: var(--grade-f); }
+
+       .result-meta h2 {
+         font-size: 1.8rem;
+         margin-bottom: 0.4rem;
+       }
+       .result-meta p { color: var(--muted); font-size: 0.92rem; max-width: 480px; }
+
+       .fields-used {
+         display: flex;
+         flex-wrap: wrap;
+         gap: 0.4rem;
+         margin-top: 0.9rem;
+       }
+       .pill {
+         font-family: var(--font-mono);
+         font-size: 0.72rem;
+         padding: 0.2rem 0.6rem;
+         border-radius: 20px;
+         border: 1px solid var(--border2);
+         color: var(--muted);
+       }
+       .pill.provided {
+         border-color: var(--accent);
+         color: var(--accent2);
+         background: rgba(59,130,246,0.08);
+       }
+
+       /* ── Charts grid ──────────────────────────────────────────── */
+       .section-heading {
+         font-family: var(--font-head);
+         font-size: 1.1rem;
+         font-weight: 700;
+         color: var(--text);
+         margin: 2.5rem 0 1rem;
+         padding-bottom: 0.5rem;
+         border-bottom: 1px solid var(--border);
+       }
+
+       .charts-grid {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+         gap: 1.2rem;
+         margin-bottom: 2rem;
+       }
+
+       .chart-card {
+         background: var(--surface);
+         border: 1px solid var(--border);
+         border-radius: var(--radius-lg);
+         padding: 1.4rem 1.6rem;
+       }
+       .chart-card h3 {
+         font-size: 0.92rem;
+         font-weight: 600;
+         color: var(--muted);
+         margin-bottom: 1rem;
+         text-transform: uppercase;
+         letter-spacing: 0.06em;
+         font-family: var(--font-mono);
+       }
+       .chart-card canvas {
+         width: 100% !important;
+       }
+
+       /* wide single cards */
+       .chart-card.full-width {
+         grid-column: 1 / -1;
+       }
+
+       /* ── Actions ─────────────────────────────────────────────── */
+       .actions-row {
+         display: flex;
+         gap: 1rem;
+         flex-wrap: wrap;
+         margin-top: 2.5rem;
+       }
