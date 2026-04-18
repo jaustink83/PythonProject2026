@@ -1,63 +1,72 @@
 {% extends "base.html" %}
-
 {% block title %}Predict Your Grade{% endblock %}
 
-{% block extra_head %}
-
-{% endblock %}
-
 {% block content %}
-<div class="page-header">
-  <h1>Predict your grade</h1>
-  <p>
-    Fill in as many fields as you like — anything left blank will be estimated
-    from the dataset average. The more you fill in, the more personalised
-    your prediction.
-  </p>
-</div>
+<div class="predict-layout">
+    <div class="form-area">
+        <div class="page-header">
+            <h1>Predict your grade</h1>
+            <p>
+                Fill in as many fields as you like
+                Every prediction is saved to your account.
+            </p>
+        </div>
 
-<form method="POST" action="/predict" autocomplete="off">
+        <form method="POST" action="{{ url_for('predict') }}" autocomplete="off">
+            <p class="section-label">Student information</p>
+            <div class="fields-grid">
+                {% for field, meta in fields.items() %}
+                <div class="field-card">
+                    <label for="{{ field }}">{{ meta.label }}</label>
+                    {% if meta.type == 'select' %}
+                    <select name="{{ field }}" id="{{ field }}">
+                        <option value="">— skip —</option>
+                        {% if meta.get('option_labels') %}
+                        {% for opt, lbl in zip(meta.options, meta.option_labels) %}
+                        <option value="{{ opt }}">{{ lbl }}</option>
+                        {% endfor %}
+                        {% else %}
+                        {% for opt in meta.options %}
+                        <option value="{{ opt }}">{{ opt }}</option>
+                        {% endfor %}
+                        {% endif %}
+                    </select>
+                    {% else %}
+                    <input type="number" name="{{ field }}" id="{{ field }}" min="{{ meta.min }}" max="{{ meta.max }}" step="1"  placeholder="skip ({{ meta.min }}–{{ meta.max }})" />
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
 
-  <p class="section-label">Student information</p>
-  <div class="fields-grid">
-    {% for field, meta in fields.items() %}
-    <div class="field-card">
-      <label for="{{ field }}">{{ meta.label }}</label>
-
-      {% if meta.type == 'select' %}
-        <select name="{{ field }}" id="{{ field }}">
-          <option value="">— skip —</option>
-          {% if meta.get('option_labels') %}
-            {% for opt, lbl in zip(meta.options, meta.option_labels) %}
-              <option value="{{ opt }}">{{ lbl }}</option>
-            {% endfor %}
-          {% else %}
-            {% for opt in meta.options %}
-              <option value="{{ opt }}">{{ opt }}</option>
-            {% endfor %}
-          {% endif %}
-        </select>
-
-      {% else %}
-        <input
-          type="number"
-          name="{{ field }}"
-          id="{{ field }}"
-          min="{{ meta.min }}"
-          max="{{ meta.max }}"
-          step="1"
-          placeholder="skip  ({{ meta.min }}–{{ meta.max }})"
-        />
-      {% endif %}
+            <div class="submit-row">
+                <button type="submit" class="btn btn-primary btn-lg">Predict my grade</button>
+                <span class="submit-note">Your result will be saved automatically.</span>
+            </div>
+        </form>
     </div>
-    {% endfor %}
-  </div>
 
-  <div class="submit-row">
-    <button type="submit" class="btn btn-primary btn-lg">
-      Predict my grade
-    </button>
-  </div>
-
-</form>
+    <aside class="sidebar">
+        <div class="sidebar-card">
+            <h3>Recent predictions</h3>
+            {% if recent %}
+            <ul class="history-list">
+                {% for p in recent %}
+                <li>
+                    <div>
+                        <span class="grade-pill grade-{{ p.grade_letter | lower }}">{{ p.grade_letter }}</span>
+                        &nbsp;{{ p.predicted_score }}/20
+                        <div class="h-date">
+                            {{ p.created_at.strftime('%d %b %Y') }}
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <a href="{{ url_for('history') }}" class="view-all-link">View full history</a>
+            {% else %}
+            <p class="no-history">No predictions yet.<br>Submit the form to get started.</p>
+            {% endif %}
+        </div>
+    </aside>
+</div>
 {% endblock %}

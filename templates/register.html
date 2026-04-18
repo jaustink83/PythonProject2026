@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Create Account{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="logo-row">
+            <div class="dot"></div>
+            <span>GradePredictor</span>
+        </div>
+
+        <h2>Create an account</h2>
+        <p class="sub">
+            Sign up to save your predictions and track improvements over time.
+        </p>
+
+        <form method="POST" action="{{ url_for('register') }}" autocomplete="off">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="choose_a_username" required minlength="3" maxlength="80" />
+                <p class="form-hint">3–80 characters, no spaces.</p>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required maxlength="120" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="at least 6 characters" required minlength="6" />
+            </div>
+
+            <div class="form-group">
+                <label for="confirm">Confirm password</label>
+                <input type="password" id="confirm" name="confirm" placeholder="repeat your password" required minlength="6" />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-full">Create account</button>
+        </form>
+
+        <p class="auth-footer">
+            Already have an account?
+            <a href="{{ url_for('login') }}">Log in here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
