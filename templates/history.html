@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Prediction History{% endblock %}
+
+{% block extra_head %}
+    {{ moment.include_moment() }}
+{% endblock %}
+
+{% block content %}
+<div class="history-header">
+    <div>
+        <h1>Prediction history</h1>
+        <p>All predictions saved to your account, most recent first.</p>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">New prediction</a>
+</div>
+
+{% if preds.items %}
+    <div class="history-table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Grade</th>
+                    <th>Score</th>
+                    <th>Date</th>
+                    <th>Inputs provided</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in preds.items %}
+                    <tr>
+                        <td class="date-text">{{ p.id }}</td>
+                        <td>
+                            <span class="grade-pill grade-{{ p.grade_letter | lower }}">
+                                {{ p.grade_letter }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="score-text">{{ p.predicted_score }}/20</span>
+                            <span class="date-text"> &middot; {{ p.percentage }}%</span>
+                        </td>
+                        <td class="date-text">
+                            {{ p.created_at.strftime('%d %b %Y') }}<br>
+                            <span style="font-size:0.75rem">{{ moment(p.created_at).format('h:mm A') }}</span>
+                        </td>
+                        <td>
+                            <div class="input-chips">
+                                {% for key, val in p.get_inputs().items() %}
+                                    <span class="chip">
+                                        <span class="chip-key">{{ key }}:</span>
+                                        <span class="chip-val">{{ val }}</span>
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+<!-- Pagination -->
+    {% if preds.pages > 1 %}
+        <div class="pagination">
+            {% if preds.has_prev %}
+                <a href="{{ url_for('history', page=preds.prev_num) }}">&lsaquo;</a>
+            {% else %}
+                <span class="disabled">&lsaquo;</span>
+            {% endif %}
+
+            {% for page_num in preds.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    {% if page_num == preds.page %}
+                        <span class="current">{{ page_num }}</span>
+                    {% else %}
+                        <a href="{{ url_for('history', page=page_num) }}">{{ page_num }}</a>
+                    {% endif %}
+                {% else %}
+                    <span style="border:none;color:var(--faint)">…</span>
+                {% endif %}
+            {% endfor %}
+
+            {% if preds.has_next %}
+                <a href="{{ url_for('history', page=preds.next_num) }}">&rsaquo;</a>
+            {% else %}
+                <span class="disabled">&rsaquo;</span>
+            {% endif %}
+        </div>
+    {% endif %}
+{% else %}
+    <div class="history-table-wrap">
+        <div class="empty-state">
+            <div class="big-icon">📊</div>
+            <h3>No predictions yet</h3>
+            <p>Submit the prediction form and your results will appear here.</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Make first prediction</a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

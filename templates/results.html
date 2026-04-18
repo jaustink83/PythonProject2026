@@ -1,197 +1,148 @@
 {% extends "base.html" %}
-
 {% block title %}Your Grade Prediction{% endblock %}
 
-{% block extra_head %}
-
-{% endblock %}
-
 {% block content %}
-
-<!-- ── Result hero ─────────────────────────────────────────── -->
-<div class="result">
-  <div class="grade-badge {{ result.css_class }}">
-    <span class="letter">{{ result.letter }}</span>
-    <span class="score">{{ result.score }}/20 &middot; {{ result.percentage }}%</span>
-  </div>
-  <div class="result-meta">
-    <h2>Predicted grade: {{ result.score }}/20</h2>
-    <p>
-      Based on {{ result.fields_used | length }} field(s) you provided.
-    </p>
-    <div class="fields-used">
-      {% for f in result.fields_used %}
-        <span class="pill provided">{{ f }}</span>
-      {% endfor %}
-      {% for f in result.fields_imputed %}
-        <span class="pill">{{ f }}</span>
-      {% endfor %}
+<div class="result-hero">
+    <div class="grade-badge {{ result.css_class }}">
+        <span class="letter">{{ result.letter }}</span>
+        <span class="score">{{ result.score }}/20 &middot; {{ result.percentage }}%</span>
     </div>
-  </div>
+
+    <div class="result-meta">
+        <h2>Predicted grade: {{ result.score }}/20</h2>
+        <p>
+            Based on {{ result.fields_used | length }} field(s) you provided.
+        </p>
+        <span class="saved-badge">Saved to your account (#{{ prediction_id }})</span>
+        <div class="fields-used">
+            {% for f in result.fields_used %}
+                <span class="pill provided">{{ f }}</span>
+            {% endfor %}
+            {% for f in result.fields_imputed %}
+                <span class="pill">{{ f }}</span>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 
-<!-- ── Overview charts ─────────────────────────────────────── -->
 <p class="section-heading">Overview</p>
 <div class="charts-grid">
-
-  <!-- Score bar -->
-  <div class="chart-card">
-    <h3>Your score vs maximum</h3>
-    <canvas id="chart-score" height="90"></canvas>
-  </div>
-
-  <!-- Feature importances -->
-  <div class="chart-card">
-    <h3>Top factors in the model</h3>
-    <canvas id="chart-importance" height="200"></canvas>
-  </div>
-
+    <div class="chart-card">
+        <h3>Your score vs maximum</h3>
+        <canvas id="chart-score" height="90"></canvas>
+    </div>
+    <div class="chart-card">
+        <h3>Top factors in the model</h3>
+        <canvas id="chart-importance" height="200"></canvas>
+    </div>
 </div>
 
-<!-- ── What-if charts ──────────────────────────────────────── -->
 {% if result.whatif %}
 <p class="section-heading">What if you changed…</p>
 <div class="charts-grid">
-  {% for field_key, scenario in result.whatif.items() %}
-  <div class="chart-card">
-    <h3>{{ scenario.label }}</h3>
-    <canvas id="whatif-{{ field_key }}" height="180"></canvas>
-  </div>
-  {% endfor %}
+    {% for field_key, scenario in result.whatif.items() %}
+    <div class="chart-card">
+        <h3>{{ scenario.label }}</h3>
+        <canvas id="whatif-{{ field_key }}" height="180"></canvas>
+    </div>
+    {% endfor %}
 </div>
 {% endif %}
 
-<!-- ── Actions ─────────────────────────────────────────────── -->
 <div class="actions-row">
-  <a href="/" class="btn btn-primary">Predict again</a>
+    <a href="{{ url_for('index') }}"   class="btn btn-primary">Predict again</a>
+    <a href="{{ url_for('history') }}" class="btn btn-ghost">View history</a>
 </div>
 
-<!-- ── Chart.js ───────────────────────────────────────────── -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
-// Data injected from Flask
-const RESULT   = {{ result | tojson }};
-const INPUTS   = {{ inputs | tojson }};
+    const RESULT = {{ result | tojson }};
+    const GRADE_COLOURS = { A:'#22c55e', B:'#84cc16', C:'#eab308', D:'#f97316', F:'#ef4444' };
+    const mainColour  = GRADE_COLOURS[RESULT.letter] || '#3b82f6';
+    const dimColour   = 'rgba(255,255,255,0.07)';
+    const mutedColour = 'rgba(255,255,255,0.25)';
+    const textColour  = '#6b7fa0';
+    const gridColour  = 'rgba(255,255,255,0.05)';
 
-// Grade-colour map
-const GRADE_COLOURS = { A:'#22c55e', B:'#84cc16', C:'#eab308', D:'#f97316', F:'#ef4444' };
-const mainColour    = GRADE_COLOURS[RESULT.letter] || '#3b82f6';
-const dimColour     = 'rgba(255,255,255,0.07)';
-const mutedColour   = 'rgba(255,255,255,0.25)';
-const textColour    = '#6b7fa0';
-const gridColour    = 'rgba(255,255,255,0.05)';
+    Chart.defaults.color       = textColour;
+    Chart.defaults.borderColor = gridColour;
+    Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+    Chart.defaults.font.size   = 11;
 
-// Shared Chart.js defaults
-Chart.defaults.color           = textColour;
-Chart.defaults.borderColor     = gridColour;
-Chart.defaults.font.family     = "'IBM Plex Mono', monospace";
-Chart.defaults.font.size       = 11;
-
-// ── 1. Score bar ──────────────────────────────────────────────────────────
-new Chart(document.getElementById('chart-score'), {
-  type: 'bar',
-  data: {
-    labels: ['Score'],
-    datasets: [
-      {
-        label: 'Your score',
-        data:  [RESULT.score],
-        backgroundColor: mainColour,
-        borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
-        borderSkipped: 'bottom',
+    // Score bar
+    new Chart(document.getElementById('chart-score'), {
+      type: 'bar',
+      data: {
+        labels: ['Score'],
+        datasets: [
+          { label: 'Your score', data: [RESULT.score], backgroundColor: mainColour,
+            borderRadius: { topLeft:4, topRight:4, bottomLeft:0, bottomRight:0 }, borderSkipped:'bottom' },
+          { label: 'Remaining',  data: [20 - RESULT.score], backgroundColor: dimColour,
+            borderRadius: { topLeft:4, topRight:4, bottomLeft:0, bottomRight:0 }, borderSkipped:'bottom' },
+        ],
       },
-      {
-        label: 'Remaining',
-        data:  [20 - RESULT.score],
-        backgroundColor: dimColour,
-        borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
-        borderSkipped: 'bottom',
-      },
-    ],
-  },
-  options: {
-    indexAxis: 'y',
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: ctx => ctx.datasetIndex === 0
+      options: {
+        indexAxis: 'y', responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ctx.datasetIndex === 0
             ? ` ${RESULT.score}/20 (${RESULT.percentage}%)`
-            : ` ${20 - RESULT.score} pts remaining`,
+            : ` ${20 - RESULT.score} pts remaining` } },
+        },
+        scales: {
+          x: { stacked: true, max: 20, grid: { color: gridColour }, ticks: { color: textColour } },
+          y: { stacked: true, display: false },
         },
       },
-    },
-    scales: {
-      x: { stacked: true, max: 20, grid: { color: gridColour },
-           ticks: { color: textColour } },
-      y: { stacked: true, display: false },
-    },
-  },
-});
+    });
 
-// ── 2. Feature importance ─────────────────────────────────────────────────
-new Chart(document.getElementById('chart-importance'), {
-  type: 'bar',
-  data: {
-    labels:   RESULT.importances.labels,
-    datasets: [{
-      label: 'Importance',
-      data:  RESULT.importances.values,
-      backgroundColor: '#3b82f6',
-      borderRadius: 3,
-    }],
-  },
-  options: {
-    indexAxis: 'y',
-    responsive: true,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { beginAtZero: true, grid: { color: gridColour }, ticks: { color: textColour } },
-      y: { grid: { display: false }, ticks: { color: textColour } },
-    },
-  },
-});
+    // Feature importance
+    new Chart(document.getElementById('chart-importance'), {
+      type: 'bar',
+      data: {
+        labels: RESULT.importances.labels,
+        datasets: [{ label: 'Importance', data: RESULT.importances.values,
+                     backgroundColor: '#3b82f6', borderRadius: 3 }],
+      },
+      options: {
+        indexAxis: 'y', responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { beginAtZero: true, grid: { color: gridColour }, ticks: { color: textColour } },
+          y: { grid: { display: false }, ticks: { color: textColour } },
+        },
+      },
+    });
 
-// ── 3. What-if charts ─────────────────────────────────────────────────────
-{% for field_key, scenario in result.whatif.items() %}
-(function () {
-  const s  = RESULT.whatif['{{ field_key }}'];
-  const bg = s.highlights.map(h => h ? mainColour : mutedColour);
-  new Chart(document.getElementById('whatif-{{ field_key }}'), {
-    type: 'bar',
-    data: {
-      labels:   s.x_labels,
-      datasets: [{
-        label: 'Predicted grade',
-        data:  s.grades,
-        backgroundColor: bg,
-        borderRadius: 3,
-      }],
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ` Grade: ${ctx.raw}/20` } },
-      },
-      scales: {
-        y: {
-          min: 0, max: 20,
-          title: { display: true, text: 'Grade /20', color: textColour },
-          grid:  { color: gridColour },
-          ticks: { color: textColour },
+    // What-if charts
+    {% for field_key, scenario in result.whatif.items() %}
+    (function () {
+      const s  = RESULT.whatif['{{ field_key }}'];
+      const bg = s.highlights.map(h => h ? mainColour : mutedColour);
+      new Chart(document.getElementById('whatif-{{ field_key }}'), {
+        type: 'bar',
+        data: {
+          labels: s.x_labels,
+          datasets: [{ label: 'Predicted grade', data: s.grades,
+                       backgroundColor: bg, borderRadius: 3 }],
         },
-        x: {
-          title: { display: true, text: s.label, color: textColour },
-          grid:  { display: false },
-          ticks: { color: textColour },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ` Grade: ${ctx.raw}/20` } },
+          },
+          scales: {
+            y: { min: 0, max: 20,
+                 title: { display: true, text: 'Grade /20', color: textColour },
+                 grid: { color: gridColour }, ticks: { color: textColour } },
+            x: { title: { display: true, text: s.label, color: textColour },
+                 grid: { display: false }, ticks: { color: textColour } },
+          },
         },
-      },
-    },
-  });
-})();
-{% endfor %}
+      });
+    })();
+    {% endfor %}
 </script>
 
 {% endblock %}

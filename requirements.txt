@@ -1,4 +1,9 @@
 flask
+flask-login
+flask-bcrypt
+flask-sqlalchemy
+flask-moment
+pymysql
 pandas
 scikit-learn
 ucimlrepo

@@ -100,9 +100,9 @@ class GradeModel:
     """
     def _load_and_train(self, user_inputs: dict):
 
-        #Load the UCI ML dataset for Student Grade prediction
+        # Load the UCI ML dataset for Student Grade prediction
         try:
-            #Get Data from UCI ML Repo
+            # Get Data from UCI ML Repo
             dataset = fetch_ucirepo(id=320)
         except ConnectionError:
             # If the UCI ML repo is down/offline load the data from local disk as a backup
@@ -237,7 +237,7 @@ class GradeModel:
     This function is the main control in the prediction model.
     The user's data is input and the logic does the following: 
     - Load and train the UCI ML model
-    - Converts the web data (dict) to DataFrame which teh modle requires
+    - Converts the web data (dict) to DataFrame which the model requires
     - Predicts the user's 'Final Grade'
     - Retain a list of the following:
         - Columns Used/Provided by User
@@ -261,8 +261,8 @@ class GradeModel:
 _model_instance: GradeModel | None = None
 
 """
-app.py_old will call this to instantiate the GradeModel.  The model will load into _model_instance and be accessible to app.py_old
-If the GradeModel has already beenm created previously, the same instance will be returned so app.py_old can access the values 
+app.py will call this to instantiate the GradeModel.  The model will load into _model_instance and be accessible to app.py
+If the GradeModel has already been created previously, the same instance will be returned so app.py can access the values 
 """
 def get_model() -> GradeModel:
     global _model_instance
