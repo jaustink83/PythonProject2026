@@ -4,6 +4,5 @@ scikit-learn
 ucimlrepo
 gunicorn
 numpy
-sklearn
 matplotlib
 seaborn
