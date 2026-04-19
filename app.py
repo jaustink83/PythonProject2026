@@ -22,7 +22,7 @@ app.jinja_env.globals.update(zip=zip)
 # Database parameters
 DB_USER = 'gradeuser'
 DB_PASS = 'gradepassword'
-DB_HOST = 'localhost'
+DB_HOST = '10.0.3.238'
 DB_PORT = '3306'
 DB_NAME = 'gradepredictor'
 
