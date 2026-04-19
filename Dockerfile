@@ -1,6 +1,6 @@
-ARG CACHEBUST=1
-
 FROM public.ecr.aws/docker/library/python:3.10-slim
+
+ARG CACHEBUST=1
 
 WORKDIR /app
 COPY . .
