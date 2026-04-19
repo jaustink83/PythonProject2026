@@ -1,0 +1,28 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --no-include-email --region us-east-1)
+      - REPO_URI=6928283259557.dkr.ecr.us-east-1.amazonaws.com/frontend
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+
+  build:
+    commands:
+      - echo Building Docker image...
+      - docker build -t $REPO_URI:$IMAGE_TAG .
+      - docker tag $REPO_URI:$IMAGE_TAG $REPO_URI:latest
+
+  post_build:
+    commands:
+      - echo Pushing Docker images...
+      - docker push $REPO_URI:$IMAGE_TAG
+      - docker push $REPO_URI:latest
+      - echo Writing imagedefinitions.json...
+      - printf '[{"name":"frontend","imageUri":"%s"}]' $REPO_URI:latest > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
