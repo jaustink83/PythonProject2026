@@ -3,12 +3,13 @@ os: linux
 
 files:
   - source: /
-    destination: /home/ec2-user/app
+    destination: /opt/codedeploy-agent/deployment-root/deployment-archive
 
 hooks:
   AfterInstall:
     - location: scripts/deploy.sh
       timeout: 300
       runas: ec2-user
+
 
 
