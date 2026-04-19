@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPO_URI="6928283259557.dkr.ecr.us-east-1.amazonaws.com/frontend"
+REPO_URI="692828329557.dkr.ecr.us-east-1.amazonaws.com/frontend"
 
 echo "Pulling latest image..."
 docker pull $REPO_URI:latest
