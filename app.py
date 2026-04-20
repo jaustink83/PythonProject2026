@@ -19,12 +19,12 @@ app.secret_key = 'student-grade-secret'
 # Load zip.  This lets us combine multiple objects into a single return
 app.jinja_env.globals.update(zip=zip)
 
-# Database parameters
-DB_USER = 'gradeuser'
-DB_PASS = 'gradepassword'
-DB_HOST = 'localhost'
-DB_PORT = '3306'
-DB_NAME = 'gradepredictor'
+# Database parameters — injected at runtime from ECS task environment / Secrets Manager
+DB_USER = os.environ.get('DB_USER', 'gradeuser')
+DB_PASS = os.environ.get('DB_PASS', 'gradepassword')
+DB_HOST = os.environ.get('DB_HOST', 'localhost')
+DB_PORT = os.environ.get('DB_PORT', '3306')
+DB_NAME = os.environ.get('DB_NAME', 'gradepredictor')
 
 # Set the DB URL
 app.config['SQLALCHEMY_DATABASE_URI'] = (
