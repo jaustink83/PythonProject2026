@@ -33,8 +33,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 # We don't need teh default Tracking that Alchemy provides
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# allows the Flask app to use the DB
+# allows the Flask app to use the DB and creates all teh tables on first launch
 db.init_app(app)
+with app.app_context():
+    db.create_all()
 # Allows the Flask app to use BCrypt to hash the passwords
 bcrypt = Bcrypt(app)
 # Allows the Flask app to reference the moment instance to determine local timezone
