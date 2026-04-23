@@ -20,11 +20,11 @@ app.secret_key = 'student-grade-secret'
 app.jinja_env.globals.update(zip=zip)
 
 # Database parameters
-DB_USER = 'gradeuser'
-DB_PASS = 'gradepassword'
-DB_HOST = '10.0.3.238'
+DB_USER = 'appuser'
+DB_PASS = 'StrongPassword123'
+DB_HOST = '10.0.1.4'
 DB_PORT = '3306'
-DB_NAME = 'gradepredictor'
+DB_NAME = 'student_db'
 
 # Set the DB URL
 app.config['SQLALCHEMY_DATABASE_URI'] = (
@@ -269,4 +269,6 @@ def history():
     return render_template('history.html', preds=preds)
 
 # Start the Flask website.
-app.run(debug=True, host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(debug=True, host='0.0.0.0', port=5000)
+
