@@ -1,0 +1,36 @@
+name: Deploy to Azure VM
+
+on:
+  push:
+    branches:
+      - AzeemDev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd ~/PythonProject2026
+
+          echo "Pulling latest code..."
+          git pull origin AzeemDev
+
+          echo "Stopping old container..."
+          docker stop flask-app || true
+          docker rm flask-app || true
+
+          echo "Building new container..."
+          docker build -t flask-app .
+
+          echo "Starting container..."
+          docker run -d -p 80:5000 --name flask-app flask-app
